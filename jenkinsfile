@@ -1,0 +1,32 @@
+pipeline {
+    agent any
+    stages {
+        stage("Build Maven") {
+            steps {
+                bat 'mvn -B clean package'
+            }
+        }
+		stage('pullLatestCode'){
+            steps {
+			git branch: 'main',
+			//  credentialsId: '86***e40-8583-4850-bcf5-24***b2e6b57',
+			//  url: 'git@ssh.dev.azure.com:v3/AzureDevOpsOrg/Project-AzureDevOps/perf-testing'
+			 url: 'https://github.com/APdrone/jenkin-gatling-integration'
+            }
+        }
+        stage("Run Gatling") {
+            steps {
+                bat 'mvn gatling:test'
+            }
+            post {
+                always {
+                    gatlingArchive()
+                }
+
+            }
+
+        }
+
+    }
+
+}
